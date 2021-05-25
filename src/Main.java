@@ -32,12 +32,17 @@ public class Main {
                 continue;
             }
 
-            try {
-                doUploadItem(file);
-            } catch (Exception e) {
-                e.printStackTrace();
+            for (int i = 0; i < 4; i++) {
+                try {
+                    doUploadItem(file);
+                    break;
+                } catch (Exception e) {
+                    e.printStackTrace();
 
-                System.out.println("=========================================失败啦---》" + file.getName());
+                    if (i == 4) {
+                        System.out.println("=========================================失败啦---》" + file.getName());
+                    }
+                }
             }
 
             try {
