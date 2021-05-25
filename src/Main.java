@@ -32,7 +32,7 @@ public class Main {
                 continue;
             }
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 5; i++) {
                 try {
                     doUploadItem(file);
                     break;
