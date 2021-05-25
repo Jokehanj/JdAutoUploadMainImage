@@ -2,6 +2,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
 import java.io.File;
 
 public class Main {
@@ -63,7 +64,14 @@ public class Main {
         WebElement wareIdElement = chromeDrive.findElement(wareId);
 
         wareIdElement.clear();
-        wareIdElement.sendKeys(file.getName().replace(".jpg", ""));
+
+        String simplename = washSimpleName(file);
+
+        if (simplename.isEmpty()) {
+            return;
+        }
+
+        wareIdElement.sendKeys(simplename);
 
         // 点击查找
         chromeDrive.findElement(By.xpath("//*[@id=\"serchFrom\"]/table/tbody/tr[2]/td/input[1]")).click();
@@ -119,13 +127,39 @@ public class Main {
         chromeDrive.findElement(isPublishSchedule).click();
 
         try {
+            // 通过js来移除readonly属性
+            String removeAttr = "document.getElementById('publishTime').removeAttribute('readonly');";
+            ((JavascriptExecutor) chromeDrive).executeScript(removeAttr);
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException k) {
+                k.printStackTrace();
+            }
+
             chromeDrive.findElement(By.id("publishTime")).sendKeys("2021-07-08 00:00:00");
         } catch (Exception e) {
             e.printStackTrace();
+
+            chromeDrive.findElement(By.id("publishTime")).click();
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException k) {
+                k.printStackTrace();
+            }
+
             // 获取js执行器
             JavascriptExecutor js = (JavascriptExecutor) chromeDrive;
             String script = "document.getElementById('publishTime').value='2021-07-08 00:00:00';";
             js.executeScript(script);
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException p) {
+                p.printStackTrace();
+            }
+            chromeDrive.findElement(By.xpath("/html/body/div[4]/div[2]/div[3]/span")).click();
         }
 
         try {
@@ -137,11 +171,41 @@ public class Main {
         chromeDrive.findElement(By.className("webuploader-element-invisible")).sendKeys(file.getAbsolutePath());
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        chromeDrive.findElement(By.xpath("//*[@id=\"img-widget-2\"]/div[2]/img[4]")).click();
+        try {
+            By dialogConfirm = By.xpath("//*[@id=\"system_alert\"]/div[3]/button/span[2]");
+
+            ChromeHelp.checkElementForWait(dialogConfirm, chromeDrive);
+
+            chromeDrive.findElement(dialogConfirm).click();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 20; i > 0; i--) {
+
+            try {
+                chromeDrive.findElements(By.className("heart-img")).get(i).click();
+                break;
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    private static String washSimpleName(File file) {
+        String simpleName = file.getName();
+
+        String[] split = simpleName.split("-");
+
+        if (split.length != 0) {
+            return split[0];
+        }
+
+        return "";
     }
 }
