@@ -14,7 +14,6 @@ public class Main {
         chromeDrive = ChromeHelp.initChromeDrive("https://vcp.jd.com");
 
         // 打开商品管理
-
         By manager = By.xpath("/html/body/section/div/header/nav[2]/div[1]/div/div/div/div[3]/a");
 
         chromeDrive.findElement(manager).click();
@@ -32,6 +31,7 @@ public class Main {
                 continue;
             }
 
+            // 如果出错，尝试5次
             for (int i = 0; i < 5; i++) {
                 try {
                     doUploadItem(file);
@@ -94,6 +94,7 @@ public class Main {
         // 点击编辑
         chromeDrive.findElement(editBtn).click();
 
+        // 编辑后可能出现的弹框保护
         try {
             By dialogConfirm = By.xpath("//*[@id=\"system_confirm\"]/div[3]/button[2]/span[2]");
 
@@ -125,16 +126,17 @@ public class Main {
         By mainImageInfo = By.id("dd3");
         chromeDrive.findElement(mainImageInfo).click();
 
+        // 选择定时功能
         By isPublishSchedule = By.id("isPublishSchedule");
-
         ChromeHelp.checkElementForWait(isPublishSchedule, chromeDrive);
-
         chromeDrive.findElement(isPublishSchedule).click();
 
         try {
             // 通过js来移除readonly属性
-            String removeAttr = "document.getElementById('publishTime').removeAttribute('readonly');";
-            ((JavascriptExecutor) chromeDrive).executeScript(removeAttr);
+            String removeAttrReadonly = "document.getElementById('publishTime').removeAttribute('readonly');";
+            ((JavascriptExecutor) chromeDrive).executeScript(removeAttrReadonly);
+            String removeAttrOnfocus= "document.getElementById('publishTime').removeAttribute('onfocus');";
+            ((JavascriptExecutor) chromeDrive).executeScript(removeAttrOnfocus);
 
             try {
                 Thread.sleep(100);
@@ -146,13 +148,17 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
 
-            chromeDrive.findElement(By.id("publishTime")).click();
-
             try {
                 Thread.sleep(100);
             } catch (InterruptedException k) {
                 k.printStackTrace();
             }
+
+            // 通过js来移除readonly属性
+            String removeAttrReadonly = "document.getElementById('publishTime').removeAttribute('readonly');";
+            ((JavascriptExecutor) chromeDrive).executeScript(removeAttrReadonly);
+            String removeAttrOnfocus= "document.getElementById('publishTime').removeAttribute('onfocus');";
+            ((JavascriptExecutor) chromeDrive).executeScript(removeAttrOnfocus);
 
             // 获取js执行器
             JavascriptExecutor js = (JavascriptExecutor) chromeDrive;
@@ -164,7 +170,6 @@ public class Main {
             } catch (InterruptedException p) {
                 p.printStackTrace();
             }
-            chromeDrive.findElement(By.xpath("/html/body/div[4]/div[2]/div[3]/span")).click();
         }
 
         try {
@@ -181,6 +186,7 @@ public class Main {
             e.printStackTrace();
         }
 
+        // 上传成功弹框点击
         try {
             By dialogConfirm = By.xpath("//*[@id=\"system_alert\"]/div[3]/button/span[2]");
 
@@ -197,7 +203,7 @@ public class Main {
                 chromeDrive.findElements(By.className("heart-img")).get(i).click();
                 break;
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
     }
